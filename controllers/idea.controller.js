@@ -29,6 +29,35 @@ export const addIdea = async (req, res) => {
       PointForts: req.body.PointForts,
       PointsFaibles: req.body.PointsFaibles,
     });
+
+    // here i contact the flask server for the AI to do his magic and return the score of the idea and evaluation of the budget
+    // send a post request to the flask server containing a json object with the idea data
+
+    const response = await fetch("http://localhost:5001/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        Title: req.body.Title,
+        Domaine: req.body.Domaine,
+        Keywords: req.body.Keywords,
+        TeamSize: req.body.TeamSize,
+        TeamExpertise: req.body.TeamExpertise,
+        Budget: req.body.Budget,
+        RevenueMensuel: req.body.RevenueMensuel,
+        RevenueMensuel: req.body.RevenueMensuel,
+        NbrClientMensuel: req.body.NbrClientMensuel,
+        PointForts: req.body.PointForts,
+        PointsFaibles: req.body.PointsFaibles,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    idea.score = data.score;
+    idea.budgetEvaluation = data.budgetEvaluation;
+
     await idea.save(idea);
     res.send({
       message: "Idea was registered successfully!",
